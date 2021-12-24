@@ -22,10 +22,18 @@ TapePerformerAudioProcessor::TapePerformerAudioProcessor()
                        )
 #endif
 {
+    
+    mFormatManager.registerBasicFormats();
+    
+    for (int i = 0; i < mNumVoices; i++)
+    {
+        mSampler.addVoice(new juce::SamplerVoice());
+    }
 }
-
+ 
 TapePerformerAudioProcessor::~TapePerformerAudioProcessor()
 {
+    mFormatReader = nullptr;
 }
 
 //==============================================================================
@@ -95,6 +103,7 @@ void TapePerformerAudioProcessor::prepareToPlay (double sampleRate, int samplesP
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    mSampler.setCurrentPlaybackSampleRate(sampleRate);
 }
 
 void TapePerformerAudioProcessor::releaseResources()
@@ -143,6 +152,8 @@ void TapePerformerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
+    
+    mSampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
@@ -150,12 +161,14 @@ void TapePerformerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
+    /*
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
 
         // ..do something to the data...
     }
+     */
 }
 
 //==============================================================================
@@ -181,6 +194,22 @@ void TapePerformerAudioProcessor::setStateInformation (const void* data, int siz
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+void TapePerformerAudioProcessor::loadFile()
+{
+    juce::FileChooser chooser { "Choose File to load" };
+    
+    
+    if ( chooser.browseForFileToOpen() )
+    {
+        auto file =  chooser.getResult();
+        mFormatReader = mFormatManager.createReaderFor(file);
+    }
+    juce::BigInteger range;
+    range.setRange(0, 127, true);
+    
+    mSampler.addSound(new juce::SamplerSound("Sample", *mFormatReader, range, 60, 0, 0, 180));
 }
 
 //==============================================================================

@@ -15,6 +15,9 @@ TapePerformerAudioProcessorEditor::TapePerformerAudioProcessorEditor (TapePerfor
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
+    mLoadButton.onClick = [&]() { audioProcessor.loadFile(); };
+    addAndMakeVisible(mLoadButton);
+    
     setSize (400, 300);
 }
 
@@ -37,4 +40,5 @@ void TapePerformerAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
+    mLoadButton.setBounds(getWidth() / 2 - 50, getHeight() / 2 - 50, 100, 100);
 }
