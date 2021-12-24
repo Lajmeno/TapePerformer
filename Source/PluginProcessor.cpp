@@ -196,8 +196,10 @@ void TapePerformerAudioProcessor::setStateInformation (const void* data, int siz
     // whose contents will have been created by the getStateInformation() call.
 }
 
+
 void TapePerformerAudioProcessor::loadFile()
 {
+    /*
     juce::FileChooser chooser { "Choose File to load" };
     
     
@@ -206,6 +208,61 @@ void TapePerformerAudioProcessor::loadFile()
         auto file =  chooser.getResult();
         mFormatReader = mFormatManager.createReaderFor(file);
     }
+     */
+    //shutdownAudio();                                                                            // [1]
+ 
+    chooser = std::make_unique<juce::FileChooser> ("Select a Wave file shorter than 2 seconds to play...",
+                                                   juce::File{},
+                                                   "*.wav");
+    auto chooserFlags = juce::FileBrowserComponent::openMode
+                      | juce::FileBrowserComponent::canSelectFiles;
+
+    chooser->launchAsync (chooserFlags, [this] (const juce::FileChooser& fc)
+    {
+        auto file = fc.getResult();
+
+        if (file == juce::File{})
+            return;
+    });
+/*
+        std::unique_ptr<juce::AudioFormatReader> reader (formatManager.createReaderFor (file)); // [2]
+
+        if (reader.get() != nullptr)
+        {
+            auto duration = (float) reader->lengthInSamples / reader->sampleRate;               // [3]
+
+            if (duration < 2)
+            {
+                fileBuffer.setSize ((int) reader->numChannels, (int) reader->lengthInSamples);  // [4]
+                reader->read (&fileBuffer,                                                      // [5]
+                              0,                                                                //  [5.1]
+                              (int) reader->lengthInSamples,                                    //  [5.2]
+                              0,                                                                //  [5.3]
+                              true,                                                             //  [5.4]
+                              true);                                                            //  [5.5]
+                position = 0;                                                                   // [6]
+                setAudioChannels (0, (int) reader->numChannels);                                // [7]
+            }
+            else
+            {
+                // handle the error that the file is 2 seconds or longer..
+            }
+        }
+    });
+ */
+    juce::BigInteger range;
+    range.setRange(0, 127, true);
+    
+    mSampler.addSound(new juce::SamplerSound("Sample", *mFormatReader, range, 60, 0, 0, 180));
+}
+ 
+ 
+void TapePerformerAudioProcessor::loadFile(const juce::String &path)
+{
+    mSampler.clearSounds();
+    auto file = juce::File (path);
+    mFormatReader = mFormatManager.createReaderFor(file);
+    
     juce::BigInteger range;
     range.setRange(0, 127, true);
     
