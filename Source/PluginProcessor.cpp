@@ -21,19 +21,25 @@ TapePerformerAudioProcessor::TapePerformerAudioProcessor()
                      #endif
                        )
 #endif
+,thumbnailCache (5),                            // [4]
+thumbnail (512, mFormatManager, thumbnailCache)
 {
     
     mFormatManager.registerBasicFormats();
     
+//    transportSource.addChangeListener (this);
+    
     for (int i = 0; i < mNumVoices; i++)
     {
         mSampler.addVoice(new juce::SamplerVoice());
+        wavePlayPosition = 0;
     }
 }
  
 TapePerformerAudioProcessor::~TapePerformerAudioProcessor()
 {
     mFormatReader = nullptr;
+    wavePlayPosition = 0;
 }
 
 //==============================================================================
@@ -104,6 +110,9 @@ void TapePerformerAudioProcessor::prepareToPlay (double sampleRate, int samplesP
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     mSampler.setCurrentPlaybackSampleRate(sampleRate);
+    
+    wavePlayPosition = 0;
+    
 }
 
 void TapePerformerAudioProcessor::releaseResources()
@@ -154,6 +163,11 @@ void TapePerformerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
         buffer.clear (i, 0, buffer.getNumSamples());
     
     mSampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    
+    if (mSampler.getNumSounds() != 0)
+    {
+        wavePlayPosition += getSampleRate();
+    }
 
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
@@ -199,18 +213,8 @@ void TapePerformerAudioProcessor::setStateInformation (const void* data, int siz
 
 void TapePerformerAudioProcessor::loadFile()
 {
-    /*
-    juce::FileChooser chooser { "Choose File to load" };
+    mSampler.clearSounds();
     
-    
-    if ( chooser.browseForFileToOpen() )
-    {
-        auto file =  chooser.getResult();
-        mFormatReader = mFormatManager.createReaderFor(file);
-    }
-     */
-    //shutdownAudio();                                                                            // [1]
- 
     chooser = std::make_unique<juce::FileChooser> ("Select a Wave file shorter than 2 seconds to play...",
                                                    juce::File{},
                                                    "*.wav");
@@ -223,37 +227,15 @@ void TapePerformerAudioProcessor::loadFile()
 
         if (file == juce::File{})
             return;
-    });
-/*
-        std::unique_ptr<juce::AudioFormatReader> reader (formatManager.createReaderFor (file)); // [2]
 
-        if (reader.get() != nullptr)
-        {
-            auto duration = (float) reader->lengthInSamples / reader->sampleRate;               // [3]
-
-            if (duration < 2)
-            {
-                fileBuffer.setSize ((int) reader->numChannels, (int) reader->lengthInSamples);  // [4]
-                reader->read (&fileBuffer,                                                      // [5]
-                              0,                                                                //  [5.1]
-                              (int) reader->lengthInSamples,                                    //  [5.2]
-                              0,                                                                //  [5.3]
-                              true,                                                             //  [5.4]
-                              true);                                                            //  [5.5]
-                position = 0;                                                                   // [6]
-                setAudioChannels (0, (int) reader->numChannels);                                // [7]
-            }
-            else
-            {
-                // handle the error that the file is 2 seconds or longer..
-            }
-        }
+        mFormatReader = mFormatManager.createReaderFor(file);
+        thumbnail.setSource (new juce::FileInputSource (file));
+        
+        juce::BigInteger range;
+        range.setRange(0, 127, true);
+        mSampler.addSound(new juce::SamplerSound("Sample", *mFormatReader, range, 60, 0, 0, 180));
     });
- */
-    juce::BigInteger range;
-    range.setRange(0, 127, true);
     
-    mSampler.addSound(new juce::SamplerSound("Sample", *mFormatReader, range, 60, 0, 0, 180));
 }
  
  
@@ -262,11 +244,14 @@ void TapePerformerAudioProcessor::loadFile(const juce::String &path)
     mSampler.clearSounds();
     auto file = juce::File (path);
     mFormatReader = mFormatManager.createReaderFor(file);
+    thumbnail.setSource (new juce::FileInputSource (file));
     
     juce::BigInteger range;
     range.setRange(0, 127, true);
     
     mSampler.addSound(new juce::SamplerSound("Sample", *mFormatReader, range, 60, 0, 0, 180));
+    
+//    wavePlayPosition = 0;
 }
 
 //==============================================================================

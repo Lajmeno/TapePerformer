@@ -15,7 +15,8 @@
 /**
 */
 class TapePerformerAudioProcessorEditor  : public juce::AudioProcessorEditor,
-public juce::FileDragAndDropTarget
+public juce::FileDragAndDropTarget,
+private juce::Timer
 {
 public:
     TapePerformerAudioProcessorEditor (TapePerformerAudioProcessor&);
@@ -27,11 +28,21 @@ public:
     
     bool isInterestedInFileDrag (const juce::StringArray& files) override;
     void filesDropped (const juce::StringArray& files, int x, int y) override;
+    
+    void paintIfFileLoaded(juce::Graphics& g, const juce::Rectangle<int>& thumbnailBounds);
+    void paintIfNoFileLoaded (juce::Graphics& g, const juce::Rectangle<int>& thumbnailBounds);
+
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
-    juce::TextButton mLoadButton { "Load Sample" };
+    juce::TextButton mLoadButton { "Load" };
+    
+    void timerCallback() override
+    {
+        repaint();
+    }
+    
     
     TapePerformerAudioProcessor& audioProcessor;
 

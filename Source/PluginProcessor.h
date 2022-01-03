@@ -14,6 +14,7 @@
 /**
 */
 class TapePerformerAudioProcessor  : public juce::AudioProcessor
+//, public juce::ChangeListener
 {
 public:
     //==============================================================================
@@ -57,15 +58,34 @@ public:
     void loadFile (const juce::String& path);
     
     int getNumSamplerSounds() { return mSampler.getNumSounds(); }
+    
+//    void changeListenerCallback (juce::ChangeBroadcaster* source) override
+//    {
+//        if (source == &transportSource)
+//            transportSourceChanged();
+//    }
+    
+//    void paintIfFileLoaded(juce::Graphics& g, const juce::Rectangle<int>& thumbnailBounds);
+    
+    juce::AudioThumbnailCache thumbnailCache;
+    juce::AudioThumbnail thumbnail;
+//    juce::AudioTransportSource transportSource;
+    juce::Synthesiser mSampler;
+    
+    int wavePlayPosition;
+    
 
 private:
     
-    
-    juce::Synthesiser mSampler;
-    const int mNumVoices { 6 };
-    
     juce::AudioFormatManager mFormatManager;
     juce::AudioFormatReader* mFormatReader { nullptr };
+    
+    
+    
+    const int mNumVoices { 6 };
+    
+    
+    
     
     std::unique_ptr<juce::FileChooser> chooser;
     //==============================================================================
