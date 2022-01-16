@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "Grain.h"
 
 //==============================================================================
 /**
@@ -45,6 +46,8 @@ private:
     
     
     TapePerformerAudioProcessor& audioProcessor;
+    
+//    GrainSound& grainSound;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TapePerformerAudioProcessorEditor)
 };

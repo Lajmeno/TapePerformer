@@ -5,6 +5,8 @@
               cppLanguageStandard="17" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn">
   <MAINGROUP id="BvgqHD" name="TapePerformer">
     <GROUP id="{E25F7BC2-2531-D1E5-3E1D-2D903B479849}" name="Source">
+      <FILE id="b82PGV" name="Grain.cpp" compile="1" resource="0" file="Source/Grain.cpp"/>
+      <FILE id="mEAY7U" name="Grain.h" compile="0" resource="0" file="Source/Grain.h"/>
       <FILE id="KGmswj" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="bvtmRW" name="PluginProcessor.h" compile="0" resource="0"

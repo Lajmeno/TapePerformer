@@ -50,6 +50,7 @@ void TapePerformerAudioProcessorEditor::paint (juce::Graphics& g)
     }
     else
     {
+//        auto& sound = grainSound.positionParam;
         paintIfFileLoaded (g, thumbnailBounds);
     }
     
@@ -118,7 +119,7 @@ void TapePerformerAudioProcessorEditor::paintIfFileLoaded (juce::Graphics& g, co
 
     g.setColour (juce::Colours::lightseagreen);  // [8]
     
-    auto audioLength = (float) audioProcessor.thumbnail.getTotalLength();
+
 
     audioProcessor.thumbnail.drawChannels (g,                                      // [9]
                             thumbnailBounds,
@@ -126,12 +127,22 @@ void TapePerformerAudioProcessorEditor::paintIfFileLoaded (juce::Graphics& g, co
                             audioProcessor.thumbnail.getTotalLength(),             // end time
                             1.0f);                                  // vertical zoom
     
-    g.setColour (juce::Colours::black);
-    auto audioPosition = (float) audioProcessor.wavePlayPosition;
-    auto drawPosition = (audioPosition / audioLength) * (float) thumbnailBounds.getWidth()
-                        + (float) thumbnailBounds.getX();                                // [13]
-    g.drawLine (drawPosition, (float) thumbnailBounds.getY(), drawPosition,
-                (float) thumbnailBounds.getBottom(), 2.0f);
+
+//    auto audioLength = (float) audioProcessor.thumbnail.getTotalLength();
+//    g.setColour (juce::Colours::black);
+//    auto audioPosition = grainSound.positionParam;
+//    
+//    auto drawPosition = (audioPosition / audioLength) * (float) thumbnailBounds.getWidth() + (float) thumbnailBounds.getX();
+//    
+//    g.drawLine (drawPosition, (float) thumbnailBounds.getY(), drawPosition,
+//                    (float) thumbnailBounds.getBottom(), 2.0f);
+//                                                        // [13]
+        
+    
+//    auto drawPosition = (audioPosition / audioLength) * (float) thumbnailBounds.getWidth()
+//                        + (float) thumbnailBounds.getX();                                // [13]
+//    g.drawLine (drawPosition, (float) thumbnailBounds.getY(), drawPosition,
+//                (float) thumbnailBounds.getBottom(), 2.0f);
 }
 
 void TapePerformerAudioProcessorEditor::paintIfNoFileLoaded (juce::Graphics& g, const juce::Rectangle<int>& thumbnailBounds)

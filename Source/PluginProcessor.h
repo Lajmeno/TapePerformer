@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "Grain.h"
 
 //==============================================================================
 /**
@@ -71,6 +72,8 @@ public:
     juce::AudioThumbnail thumbnail;
 //    juce::AudioTransportSource transportSource;
     juce::Synthesiser mSampler;
+    GrainSound* mySound;
+    GrainVoice* myVoice;
     
     int wavePlayPosition;
     
@@ -79,6 +82,7 @@ private:
     
     juce::AudioFormatManager mFormatManager;
     juce::AudioFormatReader* mFormatReader { nullptr };
+    
     
     
     
