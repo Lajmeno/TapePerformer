@@ -95,14 +95,7 @@ void GrainVoice::startNote (int midiNoteNumber, float velocity, juce::Synthesise
             
         }
         startPosition = sourceSamplePosition;
-//        (sound->pitchModeParam) ? ( pitchRatio = std::pow (2.0, (midiNoteNumber - sound->midiRootNote) / 12.0)
-//                        * sound->sourceSampleRate / getSampleRate())
-//                            : pitchRatio = 1;
 
-//        sourceSamplePosition = 0.0;
-        //Change position here by taking the length of the whole sample and then
-        //change in relation to midiNoteNuber
-//        sourceSamplePosition = 44100;
         numPlayedSamples = 0;
         lgain = velocity;
         rgain = velocity;
@@ -178,7 +171,7 @@ void GrainVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int st
             
             numPlayedSamples += pitchRatio;
             
-            if (!isKeyDown())// && numPlayedSamples > durationParam )
+            if (!isKeyDown())
             {
 //                DBG("HI");
                 stopNote (0.0f, false);
@@ -187,20 +180,9 @@ void GrainVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int st
             else if (numPlayedSamples > playingSound->durationParam)
             {
                 numPlayedSamples = 0;
-//                sourceSamplePosition = playingSound->positionParam;
                 sourceSamplePosition = startPosition;
             }
-//            if (numSamples == 0)
-//            {
-//                positionParam = sourceSamplePosition;
-//            }
-            
-//            else if (numPlayedSamples + playingSound->positionParam > playingSound->length) //Problem when numPlayedSound becomes zero but is used to figure out if the duration is completed
-//            {
-//                numPlayedSamples = 0;
-//                sourceSamplePosition = 0;
-////                playingSound->length *= 2;
-//            }
+
         }
     }
     

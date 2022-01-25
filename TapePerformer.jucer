@@ -14,6 +14,8 @@
             file="Source/PluginProcessor.h"/>
       <FILE id="Nfew64" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
+      <FILE id="QP6cUD" name="WaveDisplay.cpp" compile="1" resource="0" file="Source/WaveDisplay.cpp"/>
+      <FILE id="xTv5Eh" name="WaveDisplay.h" compile="0" resource="0" file="Source/WaveDisplay.h"/>
       <FILE id="IUgFsH" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
   </MAINGROUP>

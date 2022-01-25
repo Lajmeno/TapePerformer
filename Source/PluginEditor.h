@@ -10,14 +10,15 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-//#include "Grain.h"
+#include "WaveDisplay.h"
 
 //==============================================================================
 /**
 */
-class TapePerformerAudioProcessorEditor  : public juce::AudioProcessorEditor,
-public juce::FileDragAndDropTarget,
-private juce::Timer
+class TapePerformerAudioProcessorEditor  : public juce::AudioProcessorEditor
+//,
+//public juce::FileDragAndDropTarget,
+//private juce::Timer
 {
 public:
     TapePerformerAudioProcessorEditor (TapePerformerAudioProcessor&);
@@ -27,18 +28,31 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
     
-    bool isInterestedInFileDrag (const juce::StringArray& files) override;
-    void filesDropped (const juce::StringArray& files, int x, int y) override;
+    void updateToggleState(juce::Button* button, juce::String name);
     
-    void paintIfFileLoaded(juce::Graphics& g, const juce::Rectangle<int>& thumbnailBounds);
-    void paintIfNoFileLoaded (juce::Graphics& g, const juce::Rectangle<int>& thumbnailBounds);
+    enum RadioButtonIds
+    {
+        ModeButtons = 1001,
+        KeysAvailaibeButton = 1002
+    };
+    
+
 
 
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
+    
+    WaveDisplay waveDisplay;
+    
+    
+    juce::Label modeLabel         { {}, "Play Mode"};
+    juce::ToggleButton positionButton   { "Position" },
+                       pitchButton { "Pitch" };
 
-    juce::TextButton mLoadButton { "Load" };
+    juce::Label numKeysLabel        { {}, "Number of Fractions" };
+    juce::ToggleButton lessKeysButton  { "12" },
+                       moreKeysButton    { "24" };
+    
+    
     
     juce::ComboBox modeSelector;
     juce::ComboBox keysAvailableSelector;
@@ -49,9 +63,14 @@ private:
     juce::Slider gainSlider;
     
     
-    using ComboBoxAttachment = juce::AudioProcessorValueTreeState::ComboBoxAttachment;
-    std::unique_ptr<ComboBoxAttachment> modeAttachment;
-    std::unique_ptr<ComboBoxAttachment> keysAvailableAttachment;
+    using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
+    
+    std::unique_ptr<ButtonAttachment> modeAttachment;
+    std::unique_ptr<ButtonAttachment> keysAvailableAttachment;
+    
+//    using ComboBoxAttachment = juce::AudioProcessorValueTreeState::ComboBoxAttachment;
+//    std::unique_ptr<ComboBoxAttachment> modeAttachment;
+//    std::unique_ptr<ComboBoxAttachment> keysAvailableAttachment;
     
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     std::unique_ptr<SliderAttachment> positionAttachment;
@@ -62,10 +81,10 @@ private:
     void setSliderParams(juce::Slider& slider);
     
     
-    void timerCallback() override
-    {
-        repaint();
-    }
+//    void timerCallback() override
+//    {
+//        repaint();
+//    }
     
     
     TapePerformerAudioProcessor& audioProcessor;

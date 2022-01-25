@@ -85,6 +85,8 @@ public:
 
 private:
     
+
+    
     juce::AudioFormatManager mFormatManager;
     juce::AudioFormatReader* mFormatReader { nullptr };
     
