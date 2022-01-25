@@ -2,7 +2,8 @@
 
 <JUCERPROJECT id="gGU7V2" name="TapePerformer" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              cppLanguageStandard="17" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn">
+              cppLanguageStandard="17" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
+              pluginFormats="buildAU,buildStandalone,buildVST3">
   <MAINGROUP id="BvgqHD" name="TapePerformer">
     <GROUP id="{E25F7BC2-2531-D1E5-3E1D-2D903B479849}" name="Source">
       <FILE id="b82PGV" name="Grain.cpp" compile="1" resource="0" file="Source/Grain.cpp"/>

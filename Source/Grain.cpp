@@ -51,6 +51,21 @@ bool GrainSound::appliesToChannel (int /*midiChannel*/)
     return true;
 }
 
+void GrainSound::updateParams(const bool mode, const bool availableKeys, const float position, const float duration, const float spread)
+{
+    pitchModeParam = mode;
+    
+    numOfKeysAvailable = availableKeys + 1 * 12;
+    
+    positionParam = position * length;
+    
+    auto lengthInSeconds = length / sourceSampleRate;
+    lengthInSeconds > 3 ? durationParam = duration * ( 2.5 * sourceSampleRate) : durationParam = duration * length;
+    
+    spreadParam = spread;
+    
+}
+
 //==============================================================================
 GrainVoice::GrainVoice() {}
 GrainVoice::~GrainVoice() {}
@@ -76,7 +91,7 @@ void GrainVoice::startNote (int midiNoteNumber, float velocity, juce::Synthesise
         {
             pitchRatio = std::pow (2.0, (sound->transpositionParam - sound->midiRootNote) / 12.0) * sound->sourceSampleRate / getSampleRate();
             
-            sourceSamplePosition = std::fmod((sound->positionParam +  float(midiNoteNumber % sound->numOfKeysAvailable) / float(sound->numOfKeysAvailable) * sound->length), sound->length);
+            sourceSamplePosition = std::fmod((sound->positionParam +  (float(midiNoteNumber % sound->numOfKeysAvailable) / float(sound->numOfKeysAvailable) * sound->length) * sound->spreadParam), sound->length);
             
         }
         startPosition = sourceSamplePosition;
@@ -125,25 +140,11 @@ void GrainVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int st
     if (auto* playingSound = static_cast<GrainSound*> (getCurrentlyPlayingSound().get()))
     {
         auto& data = *playingSound->data;
-//        auto& data = outputBuffer;
         const float* const inL = data.getReadPointer (0);
         const float* const inR = data.getNumChannels() > 1 ? data.getReadPointer (1) : nullptr;
 
         float* outL = outputBuffer.getWritePointer (0, startSample);
         float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
-        
-        
-        //this for Thumbnai to show playhead
-        if (isKeyDown())
-        {
-            samplePlayPosition = (int) sourceSamplePosition;
-            isNotePlayed = true;
-        }
-        else
-        {
-            samplePlayPosition = playingSound->positionParam;
-            isNotePlayed = false;
-        }
         
 
         while (--numSamples >= 0)
@@ -171,9 +172,6 @@ void GrainVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int st
             {
                 *outL++ += (l + r) * 0.5f;
             }
-            
-            //Adding Pitch Ratio = Pitch Mode
-//            (pitchModeParam == true) ? (sourceSamplePosition += pitchRatio) : (sourceSamplePosition += 1.0);
 
             sourceSamplePosition += pitchRatio;
             sourceSamplePosition = std::fmod(sourceSamplePosition, playingSound->length);
@@ -182,7 +180,7 @@ void GrainVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int st
             
             if (!isKeyDown())// && numPlayedSamples > durationParam )
             {
-                DBG("HI");
+//                DBG("HI");
                 stopNote (0.0f, false);
                 break;
             }
@@ -192,6 +190,10 @@ void GrainVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int st
 //                sourceSamplePosition = playingSound->positionParam;
                 sourceSamplePosition = startPosition;
             }
+//            if (numSamples == 0)
+//            {
+//                positionParam = sourceSamplePosition;
+//            }
             
 //            else if (numPlayedSamples + playingSound->positionParam > playingSound->length) //Problem when numPlayedSound becomes zero but is used to figure out if the duration is completed
 //            {
@@ -201,4 +203,17 @@ void GrainVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int st
 //            }
         }
     }
+    
+    
 }
+double GrainVoice::getPosition()
+{
+//    if (!isVoiceActive())
+//    {
+//        
+//    }
+    double position;
+    (!isKeyDown()) ? (position = startPosition) : (position = sourceSamplePosition);
+    return position;
+}
+

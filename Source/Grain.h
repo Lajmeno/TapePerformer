@@ -31,12 +31,13 @@ public:
     bool appliesToNote (int midiNoteNumber) override;
     bool appliesToChannel (int midiChannel) override;
     
-    bool pitchModeParam = false;
+    int getNumOfKeysAvailable() { return numOfKeysAvailable; }
+    int getDurationParam() { return durationParam; }
+    double getPositionsParam() { return positionParam; }
+    float getSpreadParam() { return spreadParam; }
+    
+    void updateParams(const bool mode, const bool availableKeys, const float position, const float duration, const float spread);
   
-    float transpositionParam = 60.0;   //midiRoot
-    double positionParam = 0;
-    double durationParam = 22050;
-    int numOfKeysAvailable = 12;
     
     
     
@@ -51,6 +52,13 @@ private:
     int length = 0, midiRootNote = 0;
     
     juce::ADSR::Parameters params;
+    
+    bool pitchModeParam = false;
+    double positionParam = 11025;
+    float transpositionParam = 60.0;   //midiRoot
+    double durationParam = 36075;
+    int numOfKeysAvailable = 12;
+    float spreadParam = 0.2;
     
 //    JUCE_LEAK_DETECTOR (GrainSound)
 };
@@ -79,8 +87,11 @@ public:
     void renderNextBlock (juce::AudioBuffer<float>&, int startSample, int numSamples) override;
     using juce::SynthesiserVoice::renderNextBlock;
     
-    std::atomic<bool>& misNotePlayed() { return isNotePlayed; }
-    std::atomic<double>& getSamplePlayPosition() { return samplePlayPosition; }
+    
+    
+    
+    double getPosition();
+
     
     
 private:
@@ -94,10 +105,7 @@ private:
     double numPlayedSamples = 0;
     float lgain = 0, rgain = 0;
     
-    
-    //Implement the playposition to display on surface
-    std::atomic<double> samplePlayPosition = 0;
-    std::atomic<bool> isNotePlayed = false;
+
     
     
 

@@ -22,8 +22,17 @@ TapePerformerAudioProcessor::TapePerformerAudioProcessor()
                        )
 #endif
 ,thumbnailCache (2),                            // [4]
-thumbnail (512, mFormatManager, thumbnailCache)
+thumbnail (512, mFormatManager, thumbnailCache),
+apvts (*this, nullptr, "PARAMETERS", createParameterLayout())
 {
+    
+    modeParameter = apvts.getRawParameterValue ("playMode");
+    availableKeysParameter = apvts.getRawParameterValue("numKeys");
+    positionParameter = apvts.getRawParameterValue("position");
+    durationParameter = apvts.getRawParameterValue("duration");
+    spreadParameter = apvts.getRawParameterValue("spread");
+    gainParameter  = apvts.getRawParameterValue ("gain");
+    
     
     mFormatManager.registerBasicFormats();
     
@@ -34,6 +43,10 @@ thumbnail (512, mFormatManager, thumbnailCache)
         mSampler.addVoice(new GrainVoice());
 //        wavePlayPosition = 0;
     }
+    
+//    wavePlayPosition.size()= mNumVoices;
+//    wavePlayPosition.resize(mNumVoices, 0);
+//    assert(wavePlayPosition);
 }
  
 TapePerformerAudioProcessor::~TapePerformerAudioProcessor()
@@ -111,6 +124,8 @@ void TapePerformerAudioProcessor::prepareToPlay (double sampleRate, int samplesP
     // initialisation that you need..
     mSampler.setCurrentPlaybackSampleRate(sampleRate);
     
+    previousGain = *gainParameter;
+    
 //    wavePlayPosition = 0;
     
 }
@@ -153,39 +168,36 @@ void TapePerformerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
+    
+    if (auto sound = dynamic_cast<GrainSound*>(mSampler.getSound(0).get()))
+    {
+        auto& mode = *apvts.getRawParameterValue("playMode");
+        auto& availableKeys = *apvts.getRawParameterValue("numKeys");
+        auto& position = *apvts.getRawParameterValue("position");
+        auto& duration = *apvts.getRawParameterValue("duration");
+        auto& spread = *apvts.getRawParameterValue("spread");
+        sound->updateParams(mode, (int)availableKeys, (double)position, (double)duration, spread);
+        
+    }
     
     mSampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
     
     
-//    std::floor(buffer.getNumSamples() * 0.5f)
-    
-//    if (mSampler.getNumSounds() != 0)
+    //Smooth Gain Multiplication with Ramp
+//    auto currentGain = *positionParameter;
+//    if (currentGain == previousGain)
 //    {
-//        wavePlayPosition += getSampleRate();
+//        buffer.applyGain (currentGain);
 //    }
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    /*
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
-    }
-     */
+//    else
+//    {
+//        buffer.applyGainRamp (0, buffer.getNumSamples(), previousGain, currentGain);
+//
+//        previousGain = currentGain;
+//    }
+    
 }
 
 //==============================================================================
@@ -205,18 +217,29 @@ void TapePerformerAudioProcessor::getStateInformation (juce::MemoryBlock& destDa
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    
+    auto state = apvts.copyState();
+    std::unique_ptr<juce::XmlElement> xml (state.createXml());
+    copyXmlToBinary (*xml, destData);
 }
 
 void TapePerformerAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    
+    
+    std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+ 
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName (apvts.state.getType()))
+            apvts.replaceState (juce::ValueTree::fromXml (*xmlState));
 }
 
 
 void TapePerformerAudioProcessor::loadFile()
 {
-    mSampler.clearSounds();
+    
     
     //bug: when closing Filechooser without choosing a file - no file is load
     //need to keep the old file in that situation
@@ -231,19 +254,23 @@ void TapePerformerAudioProcessor::loadFile()
     {
         auto file = fc.getResult();
 
-        if (file == juce::File{})
-            return;
-        std::unique_ptr<juce::AudioFormatReader> reader (mFormatManager.createReaderFor (file)); // [2]
-//        mFormatReader = mFormatManager.createReaderFor(file);
- 
-        if (reader.get() != nullptr)
+//        if (file == juce::File{})
+//            return;
+        if (file != juce::File{})
         {
-            mFormatReader = mFormatManager.createReaderFor(file);
-            thumbnail.setSource (new juce::FileInputSource (file));
-            
-            juce::BigInteger range;
-            range.setRange(0, 127, true);
-            mSampler.addSound(new GrainSound("Sample", *mFormatReader, range, 60, 0, 0, 180));
+            std::unique_ptr<juce::AudioFormatReader> reader (mFormatManager.createReaderFor (file)); // [2]
+    //        mFormatReader = mFormatManager.createReaderFor(file);
+     
+            if (reader.get() != nullptr)
+            {
+                mSampler.clearSounds();
+                mFormatReader = mFormatManager.createReaderFor(file);
+                thumbnail.setSource (new juce::FileInputSource (file));
+                
+                juce::BigInteger range;
+                range.setRange(0, 127, true);
+                mSampler.addSound(new GrainSound("Sample", *mFormatReader, range, midiNoteForNormalPitch, 0.1, 0.1, 180));
+            }
         }
     });
     
@@ -260,7 +287,7 @@ void TapePerformerAudioProcessor::loadFile(const juce::String &path)
     juce::BigInteger range;
     range.setRange(0, 127, true);
     
-    mSampler.addSound(new GrainSound("Sample", *mFormatReader, range, 60, 0, 0, 180));
+    mSampler.addSound(new GrainSound("Sample", *mFormatReader, range, midiNoteForNormalPitch, 0.1, 0.1, 180));
     
 //    wavePlayPosition = 0;
 }
@@ -270,4 +297,27 @@ void TapePerformerAudioProcessor::loadFile(const juce::String &path)
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new TapePerformerAudioProcessor();
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout TapePerformerAudioProcessor::createParameterLayout()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout params;
+    
+    //Parameters: Mode, Position, Duration, Spread, NumofKeys, Transposition, Gain
+    
+    params.add(std::make_unique<juce::AudioParameterChoice>("playMode", "Playing Mode", juce::StringArray("Position Mode", "Pitch Mode"), 0));
+    
+    params.add(std::make_unique<juce::AudioParameterChoice>("numKeys", "Keys Available", juce::StringArray("12 Keys", "24 keys"), 0));
+    
+    
+    params.add(std::make_unique<juce::AudioParameterFloat>("position", "SamplePosition", juce::NormalisableRange<float>(0.f, 1.f, 0.001f, 1.f), 0.25f));
+    
+    params.add(std::make_unique<juce::AudioParameterFloat>("duration", "Duration", juce::NormalisableRange<float>(0.f, 1.f, 0.01f, 0.25f), 0.15f));
+    
+    params.add(std::make_unique<juce::AudioParameterFloat>("spread", "Spread", juce::NormalisableRange<float>(0.f, 1.f, 0.01f, 1.f), 1.f));
+    
+    params.add(std::make_unique<juce::AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.8f));
+        
+    return params;
+
 }

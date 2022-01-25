@@ -10,7 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-#include "Grain.h"
+//#include "Grain.h"
 
 //==============================================================================
 /**
@@ -37,7 +37,30 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
+
     juce::TextButton mLoadButton { "Load" };
+    
+    juce::ComboBox modeSelector;
+    juce::ComboBox keysAvailableSelector;
+    
+    juce::Slider positionSlider;
+    juce::Slider durationSlider;
+    juce::Slider spreadSlider;
+    juce::Slider gainSlider;
+    
+    
+    using ComboBoxAttachment = juce::AudioProcessorValueTreeState::ComboBoxAttachment;
+    std::unique_ptr<ComboBoxAttachment> modeAttachment;
+    std::unique_ptr<ComboBoxAttachment> keysAvailableAttachment;
+    
+    using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
+    std::unique_ptr<SliderAttachment> positionAttachment;
+    std::unique_ptr<SliderAttachment> durationAttachment;
+    std::unique_ptr<SliderAttachment> spreadAttachment;
+    std::unique_ptr<SliderAttachment> gainAttachment;
+    
+    void setSliderParams(juce::Slider& slider);
+    
     
     void timerCallback() override
     {

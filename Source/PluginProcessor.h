@@ -72,10 +72,15 @@ public:
     juce::AudioThumbnail thumbnail;
 //    juce::AudioTransportSource transportSource;
     juce::Synthesiser mSampler;
-    GrainSound* mySound;
-    GrainVoice* myVoice;
+
+    int midiNoteForNormalPitch = 60;
+    const int mNumVoices { 6 };
     
-    int wavePlayPosition;
+    
+    
+    juce::AudioProcessorValueTreeState apvts;
+    
+    
     
 
 private:
@@ -83,15 +88,20 @@ private:
     juce::AudioFormatManager mFormatManager;
     juce::AudioFormatReader* mFormatReader { nullptr };
     
-    
-    
-    
-    const int mNumVoices { 6 };
-    
-    
-    
-    
     std::unique_ptr<juce::FileChooser> chooser;
+    
+    
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    
+    float previousGain;
+     
+    std::atomic<float>* modeParameter = nullptr;
+    std::atomic<float>* availableKeysParameter  = nullptr;
+    std::atomic<float>* positionParameter = nullptr;
+    std::atomic<float>* durationParameter  = nullptr;
+    std::atomic<float>* spreadParameter = nullptr;
+    std::atomic<float>* gainParameter  = nullptr;
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TapePerformerAudioProcessor)
 };
