@@ -87,7 +87,7 @@ public:
     void renderNextBlock (juce::AudioBuffer<float>&, int startSample, int numSamples) override;
     using juce::SynthesiserVoice::renderNextBlock;
     
-    
+    double setStartPosition(GrainSound* sound, int midiNoteNumber);
     
     
     double getPosition();
@@ -99,6 +99,7 @@ private:
     bool keyIsDown = false;
     
     double startPosition = 0;
+    int currentMiniNumber = 0;
     
     double pitchRatio = 0;
     double sourceSamplePosition = 0;

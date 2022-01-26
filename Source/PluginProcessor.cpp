@@ -305,9 +305,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout TapePerformerAudioProcessor:
     
     //Parameters: Mode, Position, Duration, Spread, NumofKeys, Transposition, Gain
     
-    params.add(std::make_unique<juce::AudioParameterChoice>("playMode", "Playing Mode", juce::StringArray("Position Mode", "Pitch Mode"), 0));
+    params.add(std::make_unique<juce::AudioParameterChoice>("playMode", "Playing Mode", juce::StringArray("Pitch Mode", "Position Mode"), 1));
     
-    params.add(std::make_unique<juce::AudioParameterChoice>("numKeys", "Keys Available", juce::StringArray("12 Keys", "24 keys"), 0));
+    params.add(std::make_unique<juce::AudioParameterChoice>("numKeys", "Keys Available", juce::StringArray("12 Keys", "24 keys"), 1));
     
     
     params.add(std::make_unique<juce::AudioParameterFloat>("position", "SamplePosition", juce::NormalisableRange<float>(0.f, 1.f, 0.001f, 1.f), 0.25f));

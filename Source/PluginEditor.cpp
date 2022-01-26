@@ -21,7 +21,8 @@ TapePerformerAudioProcessorEditor::TapePerformerAudioProcessorEditor (TapePerfor
     
     
     modeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "playMode", positionButton);
-    keysAvailableAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "numKeys", pitchButton);
+    
+    keysAvailableAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "numKeys", lessKeysButton);
     
     
     positionAttachment = std::make_unique<SliderAttachment>(audioProcessor.apvts, "position", positionSlider);
@@ -39,22 +40,24 @@ TapePerformerAudioProcessorEditor::TapePerformerAudioProcessorEditor (TapePerfor
 
     addAndMakeVisible (positionButton);
     addAndMakeVisible (pitchButton);
-    positionButton  .onClick = [this] { updateToggleState (&positionButton,   "Position");   };
+    positionButton .onClick = [this] { updateToggleState (&positionButton,   "Position");   };
     pitchButton.onClick = [this] { updateToggleState (&pitchButton, "Pitch"); };
+    
+//    positionButton.setState(juce::Button::ButtonState(1));
 
-    positionButton  .setRadioGroupId (ModeButtons);
+    positionButton .setRadioGroupId (ModeButtons);
     pitchButton.setRadioGroupId (ModeButtons);
+    
+    addAndMakeVisible (numKeysLabel);
 
-//    addAndMakeVisible (hobbiesLabel);
-//
-//    addAndMakeVisible (sportButton);
-//    addAndMakeVisible (artButton);
-//    addAndMakeVisible (filmButton);
-//    sportButton.onClick = [this] { updateToggleState (&sportButton, "Sport"); };
-//    artButton  .onClick = [this] { updateToggleState (&artButton,   "Art");   };
-//    filmButton .onClick = [this] { updateToggleState (&filmButton,  "Film");  };
-    
-    
+    addAndMakeVisible (lessKeysButton);
+    addAndMakeVisible (moreKeysButton);
+    lessKeysButton  .onClick = [this] { updateToggleState (&lessKeysButton,   "12 Keys");   };
+    moreKeysButton.onClick = [this] { updateToggleState (&moreKeysButton, "24 Keys"); };
+
+    lessKeysButton  .setRadioGroupId (KeysAvailableButtons);
+    moreKeysButton.setRadioGroupId (KeysAvailableButtons);
+  
 }
 
 TapePerformerAudioProcessorEditor::~TapePerformerAudioProcessorEditor()
@@ -75,32 +78,28 @@ void TapePerformerAudioProcessorEditor::resized()
     
     auto bounds = getLocalBounds();
     auto responseArea = bounds.removeFromTop(bounds.getHeight()* 0.5);
-    
+    auto parameterArea = bounds;
     waveDisplay.setBounds(responseArea);
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
     
-    auto generalSettings = bounds.removeFromLeft(bounds.getWidth() * 0.15);
-    auto positionArea = bounds.removeFromRight(bounds.getWidth() * 0.2);
-    auto durationArea = bounds.removeFromRight(bounds.getWidth() * 0.2);
-    auto spreadArea = bounds.removeFromRight(bounds.getWidth() * 0.2);
+    auto generalSettings = parameterArea.removeFromLeft(juce::jmax (40, bounds.getWidth() / 6));
+    auto positionArea = parameterArea.removeFromLeft(juce::jmax (60, bounds.getWidth() / 4));
+    auto durationArea = parameterArea.removeFromLeft(juce::jmax (60, bounds.getWidth() / 4));
+    auto spreadArea = parameterArea.removeFromLeft(juce::jmax (60, bounds.getWidth() / 4));
     
-    modeLabel .setBounds (10, 10, generalSettings.getWidth() - 20, generalSettings.getHeight());
-    positionButton  .setBounds (20, 40, generalSettings.getWidth() - 30, generalSettings.getHeight());
-    pitchButton.setBounds (20, 70, generalSettings.getWidth() - 30, generalSettings.getHeight());
+    modeLabel.setBounds(generalSettings.removeFromTop(juce::jmax (20, parameterArea.getHeight() / 6)));
+    positionButton.setBounds(generalSettings.removeFromTop(juce::jmax (20, parameterArea.getHeight() / 6)));
+    pitchButton.setBounds(generalSettings.removeFromTop(juce::jmax (20, parameterArea.getHeight() / 6)));
     
-    modeSelector.setBounds(generalSettings.removeFromTop(generalSettings.getHeight() * 0.5));
-    keysAvailableSelector.setBounds(generalSettings);
-
+    numKeysLabel.setBounds(generalSettings.removeFromTop(juce::jmax (20, parameterArea.getHeight() / 6)));
+    lessKeysButton.setBounds(generalSettings.removeFromTop(juce::jmax (20, parameterArea.getHeight() / 6)));
+    moreKeysButton.setBounds(generalSettings.removeFromTop(juce::jmax (20, parameterArea.getHeight() / 6)));
+    
     positionSlider.setBounds(positionArea.removeFromTop(positionArea.getHeight() * 0.5));
     durationSlider.setBounds(durationArea.removeFromTop(durationArea.getHeight() * 0.5));
     spreadSlider.setBounds(spreadArea.removeFromTop(spreadArea.getHeight() * 0.5));
-//    highCutSlopeSlider.setBounds(highCutArea);
-    
-//    peakFreqSlider.setBounds(bounds.removeFromTop(bounds.getHeight() * 0.33));
-//    peakGainSlider.setBounds(bounds.removeFromTop(bounds.getHeight() * 0.5));
-//    peakQualitySlider.setBounds(bounds);
-    
+
     
 }
 

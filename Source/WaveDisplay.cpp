@@ -96,6 +96,7 @@ void WaveDisplay::filesDropped(const juce::StringArray &files, int x, int y)
 
 void WaveDisplay::paintIfFileLoaded (juce::Graphics& g, const juce::Rectangle<int>& thumbnailBounds)
 {
+    
     g.setColour (juce::Colours::darkorange);
     g.fillRect (thumbnailBounds);
 
@@ -152,8 +153,8 @@ void WaveDisplay::paintIfFileLoaded (juce::Graphics& g, const juce::Rectangle<in
 
             initialXPosition = std::fmod(initialXPosition + (audioLength / numFragments) * spreadParam, audioLength);
             
-            auto purpleHue = juce::Colours::plum.getHue();
-            g.setColour (juce::Colour::fromHSV (purpleHue, 1.0f, 0.5f, 0.25f));
+            auto purpleHue = juce::Colours::royalblue.getHue();
+            g.setColour (juce::Colour::fromHSV (purpleHue, .2f, 1.f, 0.4f));
             g.fillRect (fragmentBounds);
             
             if( initialXPosition + widthOfFragment > audioLength)
@@ -161,7 +162,7 @@ void WaveDisplay::paintIfFileLoaded (juce::Graphics& g, const juce::Rectangle<in
                 juce::Rectangle<int> fragmentBounds (0, 0, ( (initialXPosition + widthOfFragment) - audioLength) / audioLength * thumbnailBounds.getWidth(), thumbnailBounds.getHeight());
                 
 //                auto purpleHue = juce::Colours::darkgrey.getHue();
-                g.setColour (juce::Colour::fromHSV (purpleHue, 0.3f, 0.5f, 0.5f));
+//                g.setColour (juce::Colour::fromHSV (purpleHue, 0.3f, 0.5f, 0.25f));
                 g.fillRect (fragmentBounds);
                 
             }

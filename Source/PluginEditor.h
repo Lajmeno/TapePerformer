@@ -33,7 +33,7 @@ public:
     enum RadioButtonIds
     {
         ModeButtons = 1001,
-        KeysAvailaibeButton = 1002
+        KeysAvailableButtons = 1002
     };
     
 

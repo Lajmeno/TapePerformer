@@ -53,9 +53,9 @@ bool GrainSound::appliesToChannel (int /*midiChannel*/)
 
 void GrainSound::updateParams(const bool mode, const bool availableKeys, const float position, const float duration, const float spread)
 {
-    pitchModeParam = mode;
+    pitchModeParam = !mode;
     
-    numOfKeysAvailable = availableKeys + 1 * 12;
+    numOfKeysAvailable = !availableKeys + 1 * 12;
     
     positionParam = position * length;
     
@@ -77,8 +77,9 @@ bool GrainVoice::canPlaySound (juce::SynthesiserSound* sound)
 
 void GrainVoice::startNote (int midiNoteNumber, float velocity, juce::SynthesiserSound* s, int /*currentPitchWheelPosition*/)
 {
-    if (auto* sound = dynamic_cast<const GrainSound*> (s))
+    if (auto* sound = dynamic_cast< GrainSound*> (s)) //deleted const before GrainSound* to make set startPosition work
     {
+        currentMiniNumber = midiNoteNumber;
         
         if(sound->pitchModeParam)
         {
@@ -91,7 +92,8 @@ void GrainVoice::startNote (int midiNoteNumber, float velocity, juce::Synthesise
         {
             pitchRatio = std::pow (2.0, (sound->transpositionParam - sound->midiRootNote) / 12.0) * sound->sourceSampleRate / getSampleRate();
             
-            sourceSamplePosition = std::fmod((sound->positionParam +  (float(midiNoteNumber % sound->numOfKeysAvailable) / float(sound->numOfKeysAvailable) * sound->length) * sound->spreadParam), sound->length);
+//            sourceSamplePosition = std::fmod((sound->positionParam +  (float(midiNoteNumber % sound->numOfKeysAvailable) / float(sound->numOfKeysAvailable) * sound->length) * sound->spreadParam), sound->length);
+            sourceSamplePosition = setStartPosition(sound, midiNoteNumber);
             
         }
         startPosition = sourceSamplePosition;
@@ -180,22 +182,29 @@ void GrainVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int st
             else if (numPlayedSamples > playingSound->durationParam)
             {
                 numPlayedSamples = 0;
-                sourceSamplePosition = startPosition;
+                if(!playingSound->pitchModeParam)
+                    sourceSamplePosition = setStartPosition(playingSound, currentMiniNumber);
+                else
+                    sourceSamplePosition = startPosition;
             }
 
         }
     }
     
-    
 }
+
+//==============================================================================
+
 double GrainVoice::getPosition()
 {
-//    if (!isVoiceActive())
-//    {
-//        
-//    }
     double position;
-    (!isKeyDown()) ? (position = startPosition) : (position = sourceSamplePosition);
+    (!isKeyDown()) ? (position = 0) : (position = sourceSamplePosition);
+    return position;
+}
+
+double GrainVoice::setStartPosition(GrainSound* sound, int midiNoteNumber)
+{
+    auto position = std::fmod((sound->positionParam +  (float(midiNoteNumber % sound->numOfKeysAvailable) / float(sound->numOfKeysAvailable) * sound->length) * sound->spreadParam), sound->length);
     return position;
 }
 
