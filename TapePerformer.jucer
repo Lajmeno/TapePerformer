@@ -6,6 +6,8 @@
               pluginFormats="buildAU,buildStandalone,buildVST3">
   <MAINGROUP id="BvgqHD" name="TapePerformer">
     <GROUP id="{E25F7BC2-2531-D1E5-3E1D-2D903B479849}" name="Source">
+      <FILE id="i1cN6m" name="WavetableEnvelope.h" compile="0" resource="0"
+            file="Source/WavetableEnvelope.h"/>
       <FILE id="b82PGV" name="Grain.cpp" compile="1" resource="0" file="Source/Grain.cpp"/>
       <FILE id="mEAY7U" name="Grain.h" compile="0" resource="0" file="Source/Grain.h"/>
       <FILE id="KGmswj" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -17,6 +19,10 @@
       <FILE id="IUgFsH" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
       <FILE id="QP6cUD" name="WaveDisplay.cpp" compile="1" resource="0" file="Source/WaveDisplay.cpp"/>
       <FILE id="xTv5Eh" name="WaveDisplay.h" compile="0" resource="0" file="Source/WaveDisplay.h"/>
+      <FILE id="f4nrm1" name="EnvelopeDisplay.cpp" compile="1" resource="0"
+            file="Source/EnvelopeDisplay.cpp"/>
+      <FILE id="KE5Lgp" name="EnvelopeDisplay.h" compile="0" resource="0"
+            file="Source/EnvelopeDisplay.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>

@@ -18,6 +18,8 @@ WaveDisplay::WaveDisplay(TapePerformerAudioProcessor& p) : audioProcessor(p)
     //    audioProcessor.transportSource.addChangeListener (this);
     addAndMakeVisible(mLoadButton);
     
+//    audioProcessor.thumbnail.addChangeListener(this);
+    
     startTimer(40);
 
 
@@ -103,7 +105,8 @@ void WaveDisplay::paintIfFileLoaded (juce::Graphics& g, const juce::Rectangle<in
     g.setColour (juce::Colours::lightseagreen);
     
 
-
+    //make draw Wave only when new file is loaded ? or does it need to draw new when draw positio is drawn on top??
+    
     audioProcessor.thumbnail.drawChannels (g, thumbnailBounds, 0.0, audioProcessor.thumbnail.getTotalLength(), 1.0f);
     
 
@@ -140,10 +143,11 @@ void WaveDisplay::paintIfFileLoaded (juce::Graphics& g, const juce::Rectangle<in
     
     if (auto sound = dynamic_cast<GrainSound*>(audioProcessor.mSampler.getSound(0).get()))
     {
-        auto numFragments = sound->getNumOfKeysAvailable();
-        auto widthOfFragment = sound->getDurationParam() / audioProcessor.getSampleRate();
-        auto initialXPosition = sound->getPositionsParam() / audioProcessor.getSampleRate();
-        auto spreadParam = sound->getSpreadParam();
+        auto& numKeys = *audioProcessor.apvts.getRawParameterValue("numKeys");
+        auto numFragments = numKeys ?  12 : 24;
+        auto widthOfFragment = *audioProcessor.apvts.getRawParameterValue("duration") * audioLength;
+        auto initialXPosition = *audioProcessor.apvts.getRawParameterValue("position") * audioLength;
+        auto& spreadParam = *audioProcessor.apvts.getRawParameterValue("spread");
         
         
         for (int i = 0; i < numFragments; i++)

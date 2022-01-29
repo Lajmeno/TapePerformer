@@ -36,6 +36,7 @@ apvts (*this, nullptr, "PARAMETERS", createParameterLayout())
     
     mFormatManager.registerBasicFormats();
     
+    
 //    transportSource.addChangeListener (this);
     
     for (int i = 0; i < mNumVoices; i++)
@@ -186,17 +187,17 @@ void TapePerformerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
     
     
     //Smooth Gain Multiplication with Ramp
-//    auto currentGain = *positionParameter;
-//    if (currentGain == previousGain)
-//    {
-//        buffer.applyGain (currentGain);
-//    }
-//    else
-//    {
-//        buffer.applyGainRamp (0, buffer.getNumSamples(), previousGain, currentGain);
-//
-//        previousGain = currentGain;
-//    }
+    auto& currentGain = *gainParameter;
+    if (currentGain == previousGain)
+    {
+        buffer.applyGain (currentGain);
+    }
+    else
+    {
+        buffer.applyGainRamp (0, buffer.getNumSamples(), previousGain, currentGain);
+
+        previousGain = currentGain;
+    }
     
 }
 
@@ -269,7 +270,7 @@ void TapePerformerAudioProcessor::loadFile()
                 
                 juce::BigInteger range;
                 range.setRange(0, 127, true);
-                mSampler.addSound(new GrainSound("Sample", *mFormatReader, range, midiNoteForNormalPitch, 0.1, 0.1, 180));
+                mSampler.addSound(new GrainSound("Sample", *mFormatReader, range, midiNoteForNormalPitch, 0, 0, 180));
             }
         }
     });
@@ -287,7 +288,7 @@ void TapePerformerAudioProcessor::loadFile(const juce::String &path)
     juce::BigInteger range;
     range.setRange(0, 127, true);
     
-    mSampler.addSound(new GrainSound("Sample", *mFormatReader, range, midiNoteForNormalPitch, 0.1, 0.1, 180));
+    mSampler.addSound(new GrainSound("Sample", *mFormatReader, range, midiNoteForNormalPitch, 0, 0, 180));
     
 //    wavePlayPosition = 0;
 }
@@ -312,11 +313,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout TapePerformerAudioProcessor:
     
     params.add(std::make_unique<juce::AudioParameterFloat>("position", "SamplePosition", juce::NormalisableRange<float>(0.f, 1.f, 0.001f, 1.f), 0.25f));
     
-    params.add(std::make_unique<juce::AudioParameterFloat>("duration", "Duration", juce::NormalisableRange<float>(0.f, 1.f, 0.01f, 0.25f), 0.15f));
+    params.add(std::make_unique<juce::AudioParameterFloat>("duration", "Duration", juce::NormalisableRange<float>(0.f, 1.f, 0.001f, .4f), 0.15f));
     
-    params.add(std::make_unique<juce::AudioParameterFloat>("spread", "Spread", juce::NormalisableRange<float>(0.f, 1.f, 0.01f, 1.f), 1.f));
+    params.add(std::make_unique<juce::AudioParameterFloat>("spread", "Spread", juce::NormalisableRange<float>(0.f, 1.f, 0.001f, 0.4f), 1.f));
     
-    params.add(std::make_unique<juce::AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.8f));
+    params.add(std::make_unique<juce::AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.7f));
         
     return params;
 

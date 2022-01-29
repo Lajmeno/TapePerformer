@@ -11,6 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "WavetableEnvelope.h"
 
 
 
@@ -91,6 +92,8 @@ public:
     
     
     double getPosition();
+    
+    void createWavetableEnv();
 
     
     
@@ -111,6 +114,11 @@ private:
     
 
     juce::ADSR adsr;
+    
+    WavetableEnvelope envCurve;
+//    juce::AudioSampleBuffer envTable;
+    
+    
     
 //    JUCE_LEAK_DETECTOR (GrainVoice)
 };

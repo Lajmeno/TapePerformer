@@ -19,6 +19,7 @@
 class WaveDisplay  : public juce::Component,
 public juce::FileDragAndDropTarget,
 private juce::Timer
+//, public juce::ChangeListener
 {
 public:
     WaveDisplay(TapePerformerAudioProcessor&);
@@ -32,6 +33,11 @@ public:
     
     void paintIfFileLoaded(juce::Graphics& g, const juce::Rectangle<int>& thumbnailBounds);
     void paintIfNoFileLoaded (juce::Graphics& g, const juce::Rectangle<int>& thumbnailBounds);
+    
+//    void thumbnailChanged()
+//    {
+//        thumbnailChange = true;
+//    }
 
 private:
     
@@ -41,6 +47,13 @@ private:
     {
         repaint();
     }
+    
+//    void changeListenerCallback (juce::ChangeBroadcaster* source) override
+//    {
+//        if (source == &audioProcessor.thumbnail)       thumbnailChanged();
+//    }
+//    
+//    bool thumbnailChange = false;
     
     TapePerformerAudioProcessor& audioProcessor;
     

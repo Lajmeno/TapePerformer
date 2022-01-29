@@ -55,19 +55,27 @@ void GrainSound::updateParams(const bool mode, const bool availableKeys, const f
 {
     pitchModeParam = !mode;
     
-    numOfKeysAvailable = !availableKeys + 1 * 12;
+    numOfKeysAvailable = (availableKeys == 1) ? 12 : 24;
     
     positionParam = position * length;
     
-    auto lengthInSeconds = length / sourceSampleRate;
-    lengthInSeconds > 3 ? durationParam = duration * ( 2.5 * sourceSampleRate) : durationParam = duration * length;
+    // change here to a state that won't increase much if a sample is very long
+//    auto lengthInSeconds = length / sourceSampleRate;
+//    lengthInSeconds > 3 ? durationParam = duration * ( 2.5 * sourceSampleRate) : durationParam = duration * length;
+    durationParam = duration * length;
     
     spreadParam = spread;
     
 }
 
 //==============================================================================
-GrainVoice::GrainVoice() {}
+GrainVoice::GrainVoice() : envCurve()  //: createWavetableEnv(), envCurve(envTable) {
+{
+    envCurve.createWavetableEnv();
+//    envCurve = new WavetableEnvelope(envTable);
+//    envCurve.add(envCurves);
+    
+}
 GrainVoice::~GrainVoice() {}
 
 bool GrainVoice::canPlaySound (juce::SynthesiserSound* sound)
@@ -106,6 +114,10 @@ void GrainVoice::startNote (int midiNoteNumber, float velocity, juce::Synthesise
         adsr.setParameters (sound->params);
 
         adsr.noteOn();
+        
+
+        auto frequency = 1 / (sound->getDurationParam() / getSampleRate());
+        envCurve.setFrequency ((float) frequency, getSampleRate());
     }
     else
     {
@@ -154,9 +166,10 @@ void GrainVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int st
                                        : l;
 
             auto envelopeValue = adsr.getNextSample();
+//            auto envTableValue = envCurve.getNextSample();
 
-            l *= lgain * envelopeValue;
-            r *= rgain * envelopeValue;
+            l *= lgain * envelopeValue; //* envTableValue;
+            r *= rgain * envelopeValue;// * envTableValue;
 
             if (outR != nullptr)
             {
@@ -207,4 +220,6 @@ double GrainVoice::setStartPosition(GrainSound* sound, int midiNoteNumber)
     auto position = std::fmod((sound->positionParam +  (float(midiNoteNumber % sound->numOfKeysAvailable) / float(sound->numOfKeysAvailable) * sound->length) * sound->spreadParam), sound->length);
     return position;
 }
+
+
 

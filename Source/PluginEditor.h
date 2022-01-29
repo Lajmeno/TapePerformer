@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "WaveDisplay.h"
+#include "EnvelopeDisplay.h"
 
 //==============================================================================
 /**
@@ -42,20 +43,21 @@ public:
 private:
     
     WaveDisplay waveDisplay;
+    EnvelopeDisplay envDisplay;
     
     
     juce::Label modeLabel         { {}, "Play Mode"};
     juce::ToggleButton positionButton   { "Position" },
                        pitchButton { "Pitch" };
 
-    juce::Label numKeysLabel        { {}, "Number of Fractions" };
+    juce::Label numKeysLabel        { {}, "Fractions" };
     juce::ToggleButton lessKeysButton  { "12" },
                        moreKeysButton    { "24" };
     
     
     
-    juce::ComboBox modeSelector;
-    juce::ComboBox keysAvailableSelector;
+//    juce::ComboBox modeSelector;
+//    juce::ComboBox keysAvailableSelector;
     
     juce::Slider positionSlider;
     juce::Slider durationSlider;

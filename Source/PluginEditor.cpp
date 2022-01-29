@@ -16,7 +16,9 @@ TapePerformerAudioProcessorEditor::TapePerformerAudioProcessorEditor (TapePerfor
 {
 
     addAndMakeVisible(waveDisplay);
-    
+    addAndMakeVisible(envDisplay);
+    setResizable(true, true);
+    setResizeLimits(800, 250, 1200, 400);
     setSize (800, 300);
     
     
@@ -34,6 +36,10 @@ TapePerformerAudioProcessorEditor::TapePerformerAudioProcessorEditor (TapePerfor
     setSliderParams(positionSlider);
     setSliderParams(durationSlider);
     setSliderParams(spreadSlider);
+    
+    gainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 0);
+    addAndMakeVisible(gainSlider);
     
     
     addAndMakeVisible (modeLabel);
@@ -78,8 +84,12 @@ void TapePerformerAudioProcessorEditor::resized()
     
     auto bounds = getLocalBounds();
     auto responseArea = bounds.removeFromTop(bounds.getHeight()* 0.5);
+    auto gainArea = bounds.removeFromRight(bounds.getWidth() * 0.1);
+    auto waveEnvArea = bounds.removeFromRight(bounds.getWidth() * 0.2);
+    
+    waveDisplay.setBounds(responseArea.reduced(3));
+    envDisplay.setBounds(waveEnvArea.reduced(2));
     auto parameterArea = bounds;
-    waveDisplay.setBounds(responseArea);
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
     
@@ -99,6 +109,7 @@ void TapePerformerAudioProcessorEditor::resized()
     positionSlider.setBounds(positionArea.removeFromTop(positionArea.getHeight() * 0.5));
     durationSlider.setBounds(durationArea.removeFromTop(durationArea.getHeight() * 0.5));
     spreadSlider.setBounds(spreadArea.removeFromTop(spreadArea.getHeight() * 0.5));
+    gainSlider.setBounds(gainArea);
 
     
 }
