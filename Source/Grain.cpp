@@ -166,10 +166,10 @@ void GrainVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int st
                                        : l;
 
             auto envelopeValue = adsr.getNextSample();
-//            auto envTableValue = envCurve.getNextSample();
+            auto envTableValue = envCurve.getNextSample();
 
-            l *= lgain * envelopeValue; //* envTableValue;
-            r *= rgain * envelopeValue;// * envTableValue;
+            l *= lgain * envelopeValue * envTableValue;
+            r *= rgain * envelopeValue * envTableValue;
 
             if (outR != nullptr)
             {

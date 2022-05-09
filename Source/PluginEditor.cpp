@@ -87,7 +87,7 @@ void TapePerformerAudioProcessorEditor::resized()
     auto gainArea = bounds.removeFromRight(bounds.getWidth() * 0.1);
     auto waveEnvArea = bounds.removeFromRight(bounds.getWidth() * 0.2);
     
-    waveDisplay.setBounds(responseArea.reduced(3));
+    waveDisplay.setBounds(responseArea.reduced(4));
     envDisplay.setBounds(waveEnvArea.reduced(2));
     auto parameterArea = bounds;
     // This is generally where you'll want to lay out the positions of any

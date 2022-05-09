@@ -12,9 +12,12 @@
 #include "EnvelopeDisplay.h"
 
 //==============================================================================
-EnvelopeDisplay::EnvelopeDisplay()
+EnvelopeDisplay::EnvelopeDisplay() : envCurve()
 {
+    envCurve.setFrequency(40, 44100);
+    envCurve.createWavetableEnv();
     startTimer(40);
+    
 
 }
 
@@ -43,9 +46,20 @@ void EnvelopeDisplay::paint (juce::Graphics& g)
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
 
     g.setColour (juce::Colours::white);
+    
+    
+    
+    for (int i = 0; i < 1024; i++){
+        g.drawVerticalLine(envCurve.getNextSample(), waveDisplayArea.getHeight(), 0);
+        
+    }
+    
+    
+    /*
     g.setFont (14.0f);
     g.drawText ("EnvelopeDisplay", getLocalBounds(),
                 juce::Justification::centred, true);   // draw some placeholder text
+     */
 }
 
 void EnvelopeDisplay::resized()
