@@ -25,14 +25,17 @@ public:
 
     void paint (juce::Graphics&) override;
     void resized() override;
+    
+    
 
 private:
     void timerCallback() override
     {
-        repaint();
+        //repaint();
     }
+    void drawWaveform(juce::Graphics& g, const juce::Rectangle<int>& waveDisplayArea);
     
     WavetableEnvelope envCurve;
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnvelopeDisplay)
 };

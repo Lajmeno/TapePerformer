@@ -12,8 +12,10 @@
 #include "EnvelopeDisplay.h"
 
 //==============================================================================
-EnvelopeDisplay::EnvelopeDisplay()
+EnvelopeDisplay::EnvelopeDisplay() : envCurve()
 {
+    envCurve.createWavetableEnv();
+    envCurve.setFrequency(8, 44100);
     startTimer(40);
 
 }
@@ -24,13 +26,6 @@ EnvelopeDisplay::~EnvelopeDisplay()
 
 void EnvelopeDisplay::paint (juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-    
 
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
     
@@ -43,14 +38,27 @@ void EnvelopeDisplay::paint (juce::Graphics& g)
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
 
     g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("EnvelopeDisplay", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
+
+    drawWaveform(g, waveDisplayArea);
+    
 }
 
 void EnvelopeDisplay::resized()
 {
     // This method is where you should set the bounds of any child
     // components that your component contains..
+
+}
+
+
+void EnvelopeDisplay::drawWaveform(juce::Graphics& g, const juce::Rectangle<int>& waveDisplayArea)
+{
+    
+    auto wavetable = envCurve.getWavetable();
+    auto* samples = wavetable.getReadPointer(0);
+    
+    for (int i = 0; i < wavetable.getNumSamples(); i++){
+        g.drawVerticalLine((int)((waveDisplayArea.getWidth() / 1024.0f) * i),  waveDisplayArea.getHeight() - samples[i] * (waveDisplayArea.getHeight()) ,waveDisplayArea.getHeight());
+    }
 
 }
