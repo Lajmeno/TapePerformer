@@ -15,7 +15,6 @@
 /**
 */
 class TapePerformerAudioProcessor  : public juce::AudioProcessor
-//, public juce::ChangeListener
 {
 public:
     //==============================================================================
@@ -60,13 +59,7 @@ public:
     
     int getNumSamplerSounds() { return mSampler.getNumSounds(); }
     
-//    void changeListenerCallback (juce::ChangeBroadcaster* source) override
-//    {
-//        if (source == &transportSource)
-//            transportSourceChanged();
-//    }
-    
-//    void paintIfFileLoaded(juce::Graphics& g, const juce::Rectangle<int>& thumbnailBounds);
+
     
     juce::AudioThumbnailCache thumbnailCache;
     juce::AudioThumbnail thumbnail;

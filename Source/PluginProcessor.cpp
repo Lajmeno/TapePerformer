@@ -127,8 +127,6 @@ void TapePerformerAudioProcessor::prepareToPlay (double sampleRate, int samplesP
     
     previousGain = *gainParameter;
     
-//    wavePlayPosition = 0;
-    
 }
 
 void TapePerformerAudioProcessor::releaseResources()
@@ -303,8 +301,6 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 juce::AudioProcessorValueTreeState::ParameterLayout TapePerformerAudioProcessor::createParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout params;
-    
-    //Parameters: Mode, Position, Duration, Spread, NumofKeys, Transposition, Gain
     
     params.add(std::make_unique<juce::AudioParameterChoice>("playMode", "Playing Mode", juce::StringArray("Pitch Mode", "Position Mode"), 1));
     

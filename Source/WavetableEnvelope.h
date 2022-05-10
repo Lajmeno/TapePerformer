@@ -41,7 +41,6 @@ class WavetableEnvelope
 public:
     WavetableEnvelope ()
     {
-//        jassert (wavetable.getNumChannels() == 1);
     }
 
     void setFrequency (float frequency, float sampleRate)
@@ -80,9 +79,14 @@ public:
 
         for (unsigned int i = 0; i < tableSize; ++i)
         {
+            auto x = (i - tableSize / 2) / (tableSize / 4);
+            auto sample = std::exp(-x*x);
+            samples[i] = (float) sample;
+            /*
             auto sample = std::sin (currentAngle);
             samples[i] = (float) sample;
             currentAngle += angleDelta;
+             */
         }
 
         samples[tableSize] = samples[0];
@@ -91,7 +95,7 @@ public:
 
 private:
     juce::AudioSampleBuffer wavetable;
-//    const int tableSize;
+    
     const unsigned int tableSize = 1 << 10;
     float currentIndex = 0.0f, tableDelta = 0.0f;
 };

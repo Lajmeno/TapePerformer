@@ -12,13 +12,16 @@
 #include "EnvelopeDisplay.h"
 
 //==============================================================================
-EnvelopeDisplay::EnvelopeDisplay() : envCurve()
+EnvelopeDisplay::EnvelopeDisplay() : envCurve(), thumbnailCache(2), thumbnail(16, mFormatManager, thumbnailCache)
 {
-    envCurve.setFrequency(40, 44100);
     envCurve.createWavetableEnv();
+    envCurve.setFrequency(8, 44100);
     startTimer(40);
     
+    mFormatManager.registerBasicFormats();
 
+    buffer.setSize(1, 44100);
+    setThumbnailSource();
 }
 
 EnvelopeDisplay::~EnvelopeDisplay()
@@ -27,13 +30,6 @@ EnvelopeDisplay::~EnvelopeDisplay()
 
 void EnvelopeDisplay::paint (juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-    
 
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
     
@@ -47,12 +43,20 @@ void EnvelopeDisplay::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     
+    //thumbnail.drawChannels (g, waveDisplayArea, 0.0, thumbnail.getTotalLength(), 1.0f);
+    
+    drawWaveform(g, waveDisplayArea);
     
     
-    for (int i = 0; i < 1024; i++){
-        g.drawVerticalLine(envCurve.getNextSample(), waveDisplayArea.getHeight(), 0);
+    
+    /*
+    for (int i = 8; i < 1024; i++){
+        //int x_pos = (waveDisplayArea.getWidth() / 1024.0f) * i;
+        g.drawVerticalLine((int)((waveDisplayArea.getWidth() / 1024.0f) * i), 0.0f, (envCurve.getNextSample() + 1) * (waveDisplayArea.getHeight() / 2));
+
         
     }
+     */
     
     
     /*
@@ -67,4 +71,27 @@ void EnvelopeDisplay::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
 
+}
+
+void EnvelopeDisplay::setThumbnailSource() {
+    
+    float* out = buffer.getWritePointer(0);
+    
+    for (int i = 0; i < 44100; i++)
+    {
+        buffer.addSample(0, i, envCurve.getNextSample());
+        //*out++ += envCurve.getNextSample();
+    }
+    thumbnail.reset(1, 44100, buffer.getNumSamples());
+    thumbnail.addBlock(0, buffer, 0, buffer.getNumSamples());
+}
+
+void EnvelopeDisplay::drawWaveform(juce::Graphics& g, const juce::Rectangle<int>& waveDisplayArea)
+{
+    
+    for (int i = 0; i < 1024; i++)
+    {
+        g.drawVerticalLine((int)((waveDisplayArea.getWidth() / 1024.0f) * i), 0.0f, (envCurve.getNextSample() + 1) * (waveDisplayArea.getHeight() / 2));
+    }
+    
 }

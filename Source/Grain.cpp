@@ -188,7 +188,6 @@ void GrainVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int st
             
             if (!isKeyDown())
             {
-//                DBG("HI");
                 stopNote (0.0f, false);
                 break;
             }
