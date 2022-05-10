@@ -89,9 +89,11 @@ void EnvelopeDisplay::setThumbnailSource() {
 void EnvelopeDisplay::drawWaveform(juce::Graphics& g, const juce::Rectangle<int>& waveDisplayArea)
 {
     
-    for (int i = 0; i < 1024; i++)
-    {
-        g.drawVerticalLine((int)((waveDisplayArea.getWidth() / 1024.0f) * i), 0.0f, (envCurve.getNextSample() + 1) * (waveDisplayArea.getHeight() / 2));
-    }
+    auto wavetable = envCurve.getWavetable();
+    auto* samples = wavetable.getReadPointer(0);
     
+    for (int i = 0; i < wavetable.getNumSamples(); i++){
+        g.drawVerticalLine((int)((waveDisplayArea.getWidth() / 1024.0f) * i),  waveDisplayArea.getHeight() - samples[i] * (waveDisplayArea.getHeight()) ,waveDisplayArea.getHeight());
+    }
+
 }

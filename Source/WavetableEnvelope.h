@@ -74,13 +74,15 @@ public:
         wavetable.setSize (1, (int) tableSize + 1);
         auto* samples = wavetable.getWritePointer (0);
 
+        /*
         auto angleDelta = juce::MathConstants<double>::twoPi / (double) (tableSize - 1);
         auto currentAngle = 0.0;
+         */
 
         for (unsigned int i = 0; i < tableSize; ++i)
         {
-            auto x = (i - tableSize / 2) / (tableSize / 4);
-            auto sample = std::exp(-x*x);
+            float x = (i - 512.0f) / 256.0f ;
+            float sample = std::pow(std::exp(-x*x), 1);
             samples[i] = (float) sample;
             /*
             auto sample = std::sin (currentAngle);
@@ -90,6 +92,10 @@ public:
         }
 
         samples[tableSize] = samples[0];
+    }
+    
+    juce::AudioSampleBuffer getWavetable (){
+        return wavetable;
     }
     
 
