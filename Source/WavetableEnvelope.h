@@ -69,6 +69,7 @@ public:
 
         return currentSample;
     }
+    
     void createWavetableEnv()
     {
         wavetable.setSize (1, (int) tableSize + 1);

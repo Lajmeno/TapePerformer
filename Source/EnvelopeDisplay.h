@@ -35,18 +35,7 @@ private:
     }
     void drawWaveform(juce::Graphics& g, const juce::Rectangle<int>& waveDisplayArea);
     
-    void setThumbnailSource();
-    
-    juce::AudioFormatManager mFormatManager;
-    
     WavetableEnvelope envCurve;
-    juce::AudioThumbnailCache thumbnailCache;
-    juce::AudioThumbnail thumbnail;
-    
-    juce::AudioBuffer<float> buffer;
-    
-    //bool waveformChanged = true;
-    
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnvelopeDisplay)
 };
